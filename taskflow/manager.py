@@ -27,3 +27,9 @@ class TaskManager:
 
     def get_tasks_by_priority(self, priority):
         return [t for t in self._tasks.values() if t.priority == priority]
+
+    def delete_task(self, task_id):
+        if task_id in self._tasks.keys():
+            self._tasks.pop(task_id)  # of the task exists, pop
+            return True
+        return False

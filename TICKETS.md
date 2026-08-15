@@ -18,12 +18,12 @@ it complete) — e.g. tasks added by mistake, duplicates, tests, etc. Add
 a `delete_task(task_id)` method to `TaskManager`.
 
 ### Acceptance criteria
-- [ ] `delete_task(task_id)` removes the task if it exists
-- [ ] Returns something sensible to indicate success/failure — be
+- [x] `delete_task(task_id)` removes the task if it exists
+- [x] Returns something sensible to indicate success/failure — be
       consistent with how `complete_task` already signals that
-- [ ] Deleted tasks no longer show up in `get_pending_tasks()` or
+- [x] Deleted tasks no longer show up in `get_pending_tasks()` or
       `get_tasks_by_priority()`
-- [ ] You write the tests this time — add them to `tests/test_manager.py`
+- [x] You write the tests this time — add them to `tests/test_manager.py`
 
 ### Notes
 This one's loosely spec'd on purpose, closer to how real tickets show up.

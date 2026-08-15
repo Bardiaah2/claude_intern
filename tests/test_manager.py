@@ -34,3 +34,19 @@ def test_get_tasks_by_priority():
     high_tasks = tm.get_tasks_by_priority("high")
     assert len(high_tasks) == 1
     assert high_tasks[0].title == "High priority"
+
+def test_delete_task():
+    tm = TaskManager()
+    task = tm.add_task("I want ice cream")
+    task1 = tm.add_task("Task 1")
+    task2 = tm.add_task("Task 2")
+    task_id = task.id
+    result = tm.delete_task(task.id)
+    result1 = tm.delete_task(task_id)
+    result2 = tm.delete_task(0)
+    assert result is True
+    assert result1 is False
+    assert result2 is False
+    assert len([t for t in tm.get_pending_tasks() if t.id == task_id]) == 0
+    assert len([t for t in tm.get_tasks_by_priority("medium") if t.id == task_id]) == 0
+    assert len(tm.get_pending_tasks()) == 2

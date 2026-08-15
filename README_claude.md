@@ -8,6 +8,7 @@ so it's a good place for new engineers to get their feet wet.
 
 ```
 taskflow/
+  __init__.py  # initialize this library
   models.py    # Task dataclass
   manager.py   # TaskManager: add/complete/query tasks
 tests/
