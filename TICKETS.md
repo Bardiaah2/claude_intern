@@ -1,32 +1,48 @@
 # Closed Tickets
-
+ 
 ## TF-101: complete_task() silently fails to complete tasks — CLOSED
 Root cause: `task.id == str(task_id)` compared int to str, so the match
 never succeeded. Fixed to `task.id == task_id`. All tests green.
-
+ 
 ---
-
+ 
 # Open Tickets
-
-## TF-102: Add task deletion support
+ 
+## TF-102: Add task deletion support — CLOSED
+Added `delete_task(task_id)`. Correct approach uses membership check
+(`task_id in self._tasks`), returns True/False consistent with
+`complete_task`. Test suite covers happy path, double-delete, and
+delete-of-nonexistent-id.
+ 
+---
+ 
+# Open Tickets
+ 
+## TF-103: add_task() accepts invalid priority values
+**Reported by:** QA
 **Priority:** Medium
 **Status:** Unassigned → assigning to new intern
-
+ 
 ### Description
-Product wants users to be able to delete a task outright (not just mark
-it complete) — e.g. tasks added by mistake, duplicates, tests, etc. Add
-a `delete_task(task_id)` method to `TaskManager`.
-
+QA noticed `add_task()` happily accepts any string as `priority` — not
+just `low`/`medium`/`high`. e.g. `tm.add_task("food", priority="urgent")`
+succeeds silently. Since `get_tasks_by_priority()` (and presumably other
+code down the line) assumes only those three values exist*, a task with a
+typo'd or made-up priority becomes invisible to any priority-based
+lookup, even though it's a perfectly real task sitting in `_tasks`.
+ 
 ### Acceptance criteria
-- [x] `delete_task(task_id)` removes the task if it exists
-- [x] Returns something sensible to indicate success/failure — be
-      consistent with how `complete_task` already signals that
-- [x] Deleted tasks no longer show up in `get_pending_tasks()` or
-      `get_tasks_by_priority()`
-- [x] You write the tests this time — add them to `tests/test_manager.py`
-
+- [x] `add_task()` rejects invalid priority values
+- [x] Decide what "rejects" means — raise an exception? default silently
+      to `"medium"`? something else? Your call, but be ready to explain
+      why you picked it
+- [x] Add tests covering both valid and invalid priority values
+- [x] Existing tests still pass
 ### Notes
-This one's loosely spec'd on purpose, closer to how real tickets show up.
-Use your judgment on edge cases (e.g. deleting an ID that doesn't exist)
-and use `complete_task` as your style reference for how this codebase
-does things.
+Remember the discussion on TF-101 about internal code staying strict and
+failing loud instead of silently doing the wrong thing? This is a good
+place to actually put that into practice.
+
+\* claude got this wrong. `get_tasks_by_priority()` doesn't take specific 
+strings, neither does the Task class. I braught it up and now I'm fixing
+them so that they only accept 3 priorities.

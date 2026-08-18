@@ -26,6 +26,7 @@ class TaskManager:
         return [t for t in self._tasks.values() if not t.completed]
 
     def get_tasks_by_priority(self, priority):
+        priority = priority.lower().strip()
         return [t for t in self._tasks.values() if t.priority == priority]
 
     def delete_task(self, task_id):

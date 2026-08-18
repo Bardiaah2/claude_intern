@@ -1,9 +1,13 @@
 from taskflow.manager import TaskManager
+from pytest import raises
 
 
 def test_add_task():
     tm = TaskManager()
-    task = tm.add_task("Write onboarding doc", priority="high")
+    task = tm.add_task("Write onboarding doc", priority=" High ")
+    with raises(ValueError):
+        task1 = tm.add_task("THIS IS AN URGENT TASK", priority="hiught")
+    assert len(tm.get_pending_tasks()) == 1
     assert task.title == "Write onboarding doc"
     assert task.priority == "high"
     assert not task.completed
@@ -29,9 +33,9 @@ def test_pending_tasks_excludes_completed():
 
 def test_get_tasks_by_priority():
     tm = TaskManager()
-    tm.add_task("Low priority", priority="low")
-    tm.add_task("High priority", priority="high")
-    high_tasks = tm.get_tasks_by_priority("high")
+    tm.add_task("Low priority", priority=" Low")
+    tm.add_task("High priority", priority="high ")
+    high_tasks = tm.get_tasks_by_priority("HiGh")
     assert len(high_tasks) == 1
     assert high_tasks[0].title == "High priority"
 
