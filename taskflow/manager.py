@@ -10,8 +10,8 @@ class TaskManager:
         self._next_id = 1
 
     def add_task(self, title:str, priority:str="medium", due_at:datetime|None=None):
-        if title.__class__ != str or priority.__class__ != str or \
-                    due_at.__class__ != datetime and due_at != None:
+        if (not isinstance(title, str)) or (not isinstance(priority, str)) or \
+                    ((not isinstance(due_at, datetime)) and (due_at != None)):
             raise TypeError("add_task takes title and priority as a str and due_at either None or datetime.")
         
         task = Task(id=self._next_id, title=title, priority=priority, due_at=due_at)
