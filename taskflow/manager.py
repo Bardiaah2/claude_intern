@@ -1,4 +1,5 @@
 from .models import Task
+from datetime import datetime
 
 
 class TaskManager:
@@ -8,8 +9,12 @@ class TaskManager:
         self._tasks = {}
         self._next_id = 1
 
-    def add_task(self, title, priority="medium"):
-        task = Task(id=self._next_id, title=title, priority=priority)
+    def add_task(self, title:str, priority:str="medium", due_at:datetime|None=None):
+        if title.__class__ != str or priority.__class__ != str or \
+                    due_at.__class__ != datetime and due_at != None:
+            raise TypeError("add_task takes title and priority as a str and due_at either None or datetime.")
+        
+        task = Task(id=self._next_id, title=title, priority=priority, due_at=due_at)
         self._tasks[self._next_id] = task
         self._next_id += 1
         return task
@@ -31,6 +36,10 @@ class TaskManager:
 
     def delete_task(self, task_id):
         if task_id in self._tasks.keys():
-            self._tasks.pop(task_id)  # of the task exists, pop
+            self._tasks.pop(task_id)
             return True
         return False
+
+    def get_overdue_tasks(self):
+        pending = [t for t in self.get_pending_tasks() if t.due_at is not None]
+        return [t for t in pending if t.due_at <= datetime.now()]

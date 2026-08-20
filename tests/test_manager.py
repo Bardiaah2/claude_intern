@@ -1,5 +1,6 @@
 from taskflow.manager import TaskManager
 from pytest import raises
+from datetime import datetime, timedelta
 
 
 def test_add_task():
@@ -39,6 +40,7 @@ def test_get_tasks_by_priority():
     assert len(high_tasks) == 1
     assert high_tasks[0].title == "High priority"
 
+
 def test_delete_task():
     tm = TaskManager()
     task = tm.add_task("I want ice cream")
@@ -54,3 +56,29 @@ def test_delete_task():
     assert len([t for t in tm.get_pending_tasks() if t.id == task_id]) == 0
     assert len([t for t in tm.get_tasks_by_priority("medium") if t.id == task_id]) == 0
     assert len(tm.get_pending_tasks()) == 2
+
+
+def test_wrong_type():
+    tm = TaskManager()
+    with raises(TypeError):
+        tm.add_task(121, 123, 123)
+
+
+def test_due_at():
+    tm = TaskManager()
+    task = tm.add_task("hello", priority=" high", due_at=datetime(2026,10,20))
+    with raises(TypeError):
+        task2 = tm.add_task("cleaning", due_at="tomorrow")
+    assert task.due_at == datetime(2026,10,20)
+
+
+def test_get_overdue_tasks():
+    tm = TaskManager()
+    task = tm.add_task("hello", priority=" high", due_at=datetime.today())
+    task2 = tm.add_task("oil change", priority=" high", due_at=datetime.today())
+    tm.complete_task(task2.id)
+    task3 = tm.add_task("email")
+    task4 = tm.add_task("apply", priority="high", due_at=datetime.now()+timedelta(3))
+    overdue = tm.get_overdue_tasks()
+    assert len(overdue) == 1
+    assert overdue[0] == task

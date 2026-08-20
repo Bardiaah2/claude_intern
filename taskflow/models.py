@@ -11,6 +11,7 @@ class Task:
     priority: str = "medium"
     completed: bool = False
     created_at: datetime = field(default_factory=datetime.now)
+    due_at: datetime | None = None
     
 
     def __post_init__(self):
