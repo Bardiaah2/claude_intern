@@ -82,3 +82,19 @@ def test_get_overdue_tasks():
     overdue = tm.get_overdue_tasks()
     assert len(overdue) == 1
     assert overdue[0] == task
+
+
+def test_update_task():
+    tm = TaskManager()
+    task = tm.add_task("helo", priority=" high", due_at=datetime.today())
+    with raises(ValueError):
+        tm.update_task(task.id, "hello", priority="jigh")
+    assert tm.update_task(task.id, "hello", priority="medium")
+    assert task.title == "hello" and task.priority == "medium"
+    assert not tm.update_task(3, "hello")
+    with raises(TypeError):
+        tm.update_task(task.id, datetime="now")
+    with raises(TypeError):
+        tm.update_task("1", "hi")
+    with raises(TypeError):
+        tm.update_task(task.id, 123)

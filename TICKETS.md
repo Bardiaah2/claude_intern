@@ -4,15 +4,11 @@
 Root cause: `task.id == str(task_id)` compared int to str, so the match
 never succeeded. Fixed to `task.id == task_id`. All tests green.
 
-closed on 862ea73
-
 ## TF-102: Add task deletion support — CLOSED
 Added `delete_task(task_id)`. Correct approach uses membership check
 (`task_id in self._tasks`), returns True/False consistent with
 `complete_task`. Test suite covers happy path, double-delete, and
 delete-of-nonexistent-id.
-
-closed on 29bdb45
 
 ## TF-103: add_task() accepts invalid priority values — CLOSED
 Validation moved into `Task.__post_init__`, normalizing (lowercase/strip)
@@ -21,36 +17,50 @@ on anything else. Correctly implemented via __post_init__ rather than a
 hand-rolled __init__, preserving dataclass-generated __eq__/__repr__ and
 proper default_factory behavior for created_at.
 
-closed on dcc3eb5
+---
+
+# Open Tickets
+
+## TF-104: Add due dates and overdue detection — CLOSED
+Added optional `due_at: datetime | None` to `Task`, `get_overdue_tasks()`
+on `TaskManager` (pending + due_at not None + due_at <= now). Type
+checking added to `add_task()` using `isinstance()`, deliberately kept
+separate from `Task`'s own value validation — TypeError for wrong type,
+ValueError for right type/wrong value. Tests cover no due date, future,
+past+pending, and past+completed.
 
 ---
 
 # Open Tickets
 
-## TF-104: Add due dates and overdue detection
+## TF-105: Add update_task() to edit existing tasks
 **Priority:** Medium
 **Status:** Unassigned → assigning to new intern
 
 ### Description
-Product wants tasks to optionally have a due date, plus a way to see
-which tasks are overdue — due date has passed, and the task isn't done
-yet.
+Users need to edit a task after creating it — fix a typo in the title,
+bump the priority, push back the due date — without deleting and
+re-adding it. Add `update_task(task_id, title=None, priority=None,
+due_at=None)` to `TaskManager`. Only the fields actually passed in
+should change; anything left as `None` should stay whatever it already
+was.
 
 ### Acceptance criteria
-- [x] `Task` gains an optional due date. Existing code that creates tasks
-      without one must keep working exactly as before
-- [x] `add_task()` supports optionally passing a due date
-- [x] New `get_overdue_tasks()` method on `TaskManager` returns pending
-      tasks whose due date has passed
-- [x] A task with no due date is never considered overdue
-- [x] A completed task is never considered overdue, even if its due date
-      is in the past
-- [x] Tests covering: no due date, future due date, past due date + still
-      pending, past due date + completed
+- [x] `update_task()` updates only the fields provided, leaves the rest
+      untouched
+- [x] Returns something sensible for found/not-found, consistent with
+      how the rest of this codebase signals that
+- [x] All existing validation rules still apply — an invalid priority
+      (wrong type or wrong value) or an invalid `due_at` type must be
+      rejected exactly the same way it would be on creation. No
+      exceptions to that.
+- [x] Tests covering: a valid partial update (e.g. title only), an
+      invalid priority update, an invalid `due_at` type update, and an
+      update on a task id that doesn't exist
 
 ### Notes
-Think about what type a due date should be, and stay consistent with how
-`created_at` is already handled in this codebase. Also — think carefully
-about default values here. You already had to reason hard about defaults
-once on this ticket set (inside `Task`); bring that same level of
-paranoia to this one too.
+This one sits directly on top of what you already built for TF-103 and
+TF-104. Before you write any code: think hard about *how* validation
+currently gets triggered on a `Task` at all, and whether that mechanism
+still fires if your update logic just does something like
+`task.title = new_title` directly on an existing instance.

@@ -16,7 +16,11 @@ class Task:
 
     def __post_init__(self):
         self.priority = self.priority.lower().strip()
-        if self.priority in self._PRIORITIES:
-            pass
-        else:
-            raise ValueError("Task can only take low, medium and high as priorit.")
+        if self.priority not in self._PRIORITIES:
+            raise ValueError("Task can only take low, medium and high as priorities.")
+
+    def check_values(self):
+        # add more checks as this dataclass evolves, post_init and this may need different actions
+        self.priority = self.priority.lower().strip()
+        if self.priority not in self._PRIORITIES:
+            raise ValueError("Task can only take low, medium and high as priorities.")
