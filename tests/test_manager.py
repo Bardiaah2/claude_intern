@@ -89,11 +89,12 @@ def test_update_task():
     task = tm.add_task("helo", priority=" high", due_at=datetime.today())
     with raises(ValueError):
         tm.update_task(task.id, "hello", priority="jigh")
+    assert task.title == "helo" and task.priority == "high"
     assert tm.update_task(task.id, "hello", priority="medium")
     assert task.title == "hello" and task.priority == "medium"
     assert not tm.update_task(3, "hello")
     with raises(TypeError):
-        tm.update_task(task.id, datetime="now")
+        tm.update_task(task.id, due_at="now")
     with raises(TypeError):
         tm.update_task("1", "hi")
     with raises(TypeError):

@@ -53,8 +53,13 @@ class TaskManager:
         if task_id not in self._tasks.keys():
             return False
         task = self._tasks[task_id]
-        if title: task.title = title
-        if due_at: task.due_at = due_at
-        if priority: task.priority = priority
-        task.check_values()
+        pre_title, pre_due_at, pre_priority = task.title, task.due_at, task.priority
+        if title is not None: task.title = title
+        if due_at is not None: task.due_at = due_at
+        if priority is not None: task.priority = priority
+        try:
+            task.check_values()
+        except ValueError as e:
+            task.title, task.due_at, task.priority = pre_title, pre_due_at, pre_priority
+            raise ValueError(e)
         return True
